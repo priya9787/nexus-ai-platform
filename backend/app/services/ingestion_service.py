@@ -10,6 +10,11 @@ from app.services.embedding_service import (
     EmbeddingService
 )
 
+from app.services.vector_db_service import (
+    VectorDBService
+)
+
+
 
 class IngestionService:
 
@@ -27,9 +32,17 @@ class IngestionService:
         embeddings = (
             EmbeddingService.generate_embeddings(chunks)
         )
+        
+        VectorDBService.create_collection()
+
+        VectorDBService.store_embeddings(
+            chunks,
+            embeddings
+        )
 
         return {
             "documents": documents,
             "chunks": chunks,
-            "embeddings": embeddings
+            "embeddings": embeddings,
+            "chunks":len(chunks)
         }

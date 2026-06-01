@@ -37,5 +37,5 @@ async def upload_document(
 
     return {
         "message": "Document processed",
-        "chunks": len(result["chunks"])
+        "chunks": result["chunks"]
     }

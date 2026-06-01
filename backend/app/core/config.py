@@ -7,10 +7,14 @@ class Settings(BaseSettings): #Create a structured configuration object
 
     API_V1_PREFIX: str = "/api/v1"
 
-    OPENAI_API_KEY: str = ""
+    GROQ_API_KEY: str = "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"
 
     QDRANT_URL: str = ""
     REDIS_URL: str = ""
+    LANGCHAIN_API_KEY: str = ""
+
+    LANGCHAIN_PROJECT: str = ""
+    LANGCHAIN_TRACING_V2: str = "false"
 
     class Config:
         env_file = ".env" # Load variables from .env file automatically

@@ -3,7 +3,9 @@ from app.core.config import settings
 # from app.api.v1.router import router
 from app.core.exceptions import (AppException,app_exception_handler)
 from app.middleware.logging import LoggingMiddleware
-from app.api.v1.document_routes import router
+from app.api.v1.router import router
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -13,6 +15,19 @@ app = FastAPI(
 app.add_exception_handler(AppException,app_exception_handler)
 
 app.add_middleware(LoggingMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+
+    allow_credentials=True,
+
+    allow_methods=["*"],
+
+    allow_headers=["*"],
+)
 
 # @app.get("/")
 # async def root():

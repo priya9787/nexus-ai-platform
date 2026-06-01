@@ -1,0 +1,38 @@
+from app.services.memory_service import (
+    MemoryService
+)
+
+from app.services.rag_service import (
+    RAGService
+)
+
+
+def retrieval_agent(state):
+
+    # history = MemoryService.get_history(
+    #     state["session_id"]
+    # )
+    
+    history =[]
+
+    query = state["query"]
+
+    enriched_query = f"""
+
+    History:
+
+    {history}
+
+    Current Query:
+
+    {query}
+
+    """
+
+    result = RAGService.ask(
+        enriched_query
+    )
+
+    return {
+        "response": result["final_response"]
+    }
