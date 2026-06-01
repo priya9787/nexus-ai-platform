@@ -7,7 +7,7 @@ class Settings(BaseSettings): #Create a structured configuration object
 
     API_V1_PREFIX: str = "/api/v1"
 
-    GROQ_API_KEY: str = "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"
+    GROQ_API_KEY: str = ""
 
     QDRANT_URL: str = ""
     REDIS_URL: str = ""
