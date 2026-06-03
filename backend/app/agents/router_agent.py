@@ -2,6 +2,7 @@ from groq import Groq
 
 from app.core.config import settings
 
+import time
 
 client = Groq(
     api_key=settings.GROQ_API_KEY
@@ -9,6 +10,8 @@ client = Groq(
 
 def router_agent(state):
     print("Groq Key",settings.GROQ_API_KEY)
+    
+    start = time.time()
 
     query = state["query"]
 
@@ -28,14 +31,54 @@ def router_agent(state):
     """
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="llama-3.1-8b-instant",
         messages=[
             {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        temperature=0
+            "role": "system",
+
+            "content": """
+
+            You are a query router. 
+
+            Return ONLY one word.
+            retrieval:
+            - factual questions
+            - explanations
+            - document questions
+            - knowledge lookup
+            - "what is"
+            - "explain"
+
+
+            summarization:
+            - summarize text
+            - shorten content
+            - rewrite content
+
+            Output ONLY:
+
+                retrieval
+
+                OR
+
+                summarization
+
+                No explanation.
+                """
+        },
+
+        {
+            "role": "user",
+
+            "content": state["query"]
+        }
+
+       ],temperature=0
+    )
+    
+    print(
+        "ROUTER TIME:",
+        time.time() - start
     )
 
     decision = (

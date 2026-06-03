@@ -5,13 +5,15 @@ defineProps({
 </script>
 
 <template>
-  <div>
-    <h3>Agent Path</h3>
+ <div class="trace-container">
+  <h3>Agent Path</h3>
 
-    <div v-for="item in path" :key="item">
-      ↓
-
-      {{ item }}
-    </div>
+  <div
+    v-for="item in path"
+    :key="item"
+    class="trace-item"
+  >
+    ↓ {{ item }}
   </div>
+</div>
 </template>

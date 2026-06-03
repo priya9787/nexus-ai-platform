@@ -1,3 +1,5 @@
 <template>
-  <div>Thinking...</div>
+  <div class="typing">
+  Thinking...
+</div>
 </template>

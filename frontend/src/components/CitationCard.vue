@@ -5,12 +5,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="border p-2 mb-2">
-    <pre>
-
-{{ source }}
-
-</pre
-    >
-  </div>
+  <div class="source-card">
+  <pre>{{ source }}</pre>
+</div>
 </template>

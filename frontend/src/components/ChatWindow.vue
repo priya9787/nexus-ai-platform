@@ -7,7 +7,11 @@ defineProps({
 </script>
 
 <template>
-  <div>
-    <ChatBubble v-for="(msg, index) in messages" :key="index" :message="msg" />
+  <div class="chat-window">
+    <ChatBubble
+      v-for="(msg,index) in messages"
+      :key="index"
+      :message="msg"
+    />
   </div>
 </template>

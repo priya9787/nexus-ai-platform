@@ -5,13 +5,21 @@ defineProps({
 </script>
 
 <template>
-  <div class="p-3 border rounded mb-2">
-    <strong>
-      {{ message.role }}
-    </strong>
+  <div
+    class="chat-row"
+    :class="message.role"
+  >
+    <div
+      class="chat-bubble"
+      :class="message.role"
+    >
+      <div class="role">
+        {{ message.role }}
+      </div>
 
-    <p>
-      {{ message.content }}
-    </p>
+      <div class="message-text">
+        {{ message.content }}
+      </div>
+    </div>
   </div>
 </template>

@@ -17,7 +17,7 @@ router = APIRouter()
 
 async def stream_chat(
     query: str,
-    session_id: str
+    session_id: str ='test-session'
 ):
 
     async def event_generator():
