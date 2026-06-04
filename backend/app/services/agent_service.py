@@ -15,29 +15,32 @@ class AgentService:
         query
     ):
 
-        # MemoryService.save_message(
-        #     session_id,
-        #     "user",
-        #     query
-        # )
+        MemoryService.save_message(
+            session_id,
+            "user",
+            query
+        )
+        
+        history= MemoryService.get_history(session_id)
 
         result = graph.invoke({
 
             "session_id": session_id,
 
-            "query": query
-
+            "query": query,
+            
+            "history":history
         })
 
-        # MemoryService.save_message(
+        MemoryService.save_message(
 
-        #     session_id,
+            session_id,
 
-        #     "assistant",
+            "assistant",
 
-        #     result["final_response"]
+            result["final_response"]
 
-        # )
+        )
 
         return {
 

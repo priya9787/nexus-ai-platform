@@ -206,3 +206,39 @@ body {
   background: #334155;
   border-radius: 20px;
 }
+
+.header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 25px;
+
+}
+
+.new-chat-btn {
+
+  border: none;
+
+  padding: 10px 18px;
+
+  border-radius: 10px;
+
+  background: #1f4fd1;
+
+  color: white;
+
+  cursor: pointer;
+
+  font-weight: 600;
+
+}
+
+.new-chat-btn:hover {
+
+  opacity: .9;
+
+}

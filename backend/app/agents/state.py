@@ -12,3 +12,5 @@ class AgentState(TypedDict):
     final_response: str
 
     agent_decision: str
+    
+    history: list

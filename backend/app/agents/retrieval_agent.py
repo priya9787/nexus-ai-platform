@@ -9,11 +9,10 @@ from app.services.rag_service import (
 
 def retrieval_agent(state):
 
-    # history = MemoryService.get_history(
-    #     state["session_id"]
-    # )
+    history = MemoryService.get_history(
+        state["session_id"]
+    )
     
-    history =[]
 
     query = state["query"]
 

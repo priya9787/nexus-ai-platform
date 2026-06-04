@@ -14,7 +14,9 @@ const input = ref("");
 
 const eventSource = ref(null);
 
-const sessionId = "test-session";
+const sessionId = ref(
+  crypto.randomUUID()
+);
 
 function sendMessage() {
   if (!input.value.trim() || chatStore.loading) return;
@@ -47,7 +49,7 @@ function sendMessage() {
     chatStore.messages.length - 1;
 
   eventSource.value = new EventSource(
-    `http://localhost:8000/api/v1/stream?query=${encodeURIComponent(query)}&session_id=${sessionId}`,
+    `http://localhost:8000/api/v1/stream?query=${encodeURIComponent(query)}&session_id=${sessionId.value}`,
   );
 
   eventSource.value.addEventListener(
@@ -106,13 +108,42 @@ function sendMessage() {
 
   input.value = "";
 }
+
+function newChat() {
+
+  eventSource.value?.close();
+
+  eventSource.value = null;
+
+  sessionId.value =
+    crypto.randomUUID();
+
+  chatStore.messages = [];
+
+  chatStore.sources = [];
+
+  chatStore.agentPath = [];
+
+  chatStore.setLoading(false);
+
+}
 </script>
 
 <template>
   <div class="app-container">
-    <h1 class="app-title">
-      NexusAI
-    </h1>
+   <div class="header">
+
+  <h1 class="app-title">
+
+    NexusAI
+
+  </h1>
+  <button
+    class="new-chat-btn"
+    @click="newChat"
+  >  New Chat
+  </button>
+</div>
 
     <ChatWindow
       :messages="chatStore.messages"
