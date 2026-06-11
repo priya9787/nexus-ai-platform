@@ -1,7 +1,7 @@
 <script setup>
-import ChatPage from "./pages/ChatPage.vue";
+import MainLayout from "./layouts/MainLayout.vue";
 </script>
 
 <template>
-  <ChatPage />
+  <MainLayout />
 </template>
