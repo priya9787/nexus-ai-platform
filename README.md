@@ -1,147 +1,236 @@
 # NexusAI Platform
 
-Enterprise-style conversational AI platform for private document Q&A. NexusAI combines PDF ingestion, Qdrant vector retrieval, LangGraph agent orchestration, role-aware access filtering, and a Vue streaming chat interface.
+Enterprise-style conversational AI platform for private document question-answering using Retrieval-Augmented Generation (RAG).
 
-This project is built as a portfolio-grade AI engineering system: the goal is to show how a real enterprise RAG application is structured, where documents are ingested into a private knowledge base and users query them through a governed chat interface.
+NexusAI enables organizations to upload internal documents, index them into a vector database, and interact with them through a governed conversational interface powered by LLMs and agent workflows.
 
-## Implemented Features
+The platform combines document ingestion, role-based retrieval controls, vector search, LangGraph orchestration, and real-time streaming responses to simulate a production-ready enterprise AI system.
 
-- PDF document upload, parsing, chunking, embedding, and indexing.
-- Qdrant dense vector search over uploaded enterprise documents.
-- Role-aware retrieval filtering using document-level `allowed_roles` metadata.
-- LangGraph multi-step agent workflow with router, retrieval, summarizer, and critic nodes.
-- Server-sent event streaming for real-time assistant responses.
-- Source citations with page metadata and access-role visibility.
-- Local chat session history with saved messages, sources, and agent path.
-- Grounded generation behavior that returns no sources when the model says it does not know.
-- Vue dashboard, documents, chat, monitoring, and settings pages.
+---
 
-## Architecture
+## Key Features
+
+### Document Ingestion
+
+* Upload PDF documents through a web interface
+* Automatic document parsing and text extraction
+* Recursive chunking for retrieval optimization
+* Embedding generation using Sentence Transformers
+* Vector indexing in Qdrant
+
+### Retrieval-Augmented Generation (RAG)
+
+* Dense vector similarity search
+* Context-aware document retrieval
+* Source citation generation
+* Page-level metadata tracking
+* Grounded answer generation
+
+### Role-Based Access Control (RBAC)
+
+* Document-level access permissions
+* Role-aware retrieval filtering
+* Configurable access roles:
+
+  * Admin
+  * HR
+  * Engineering
+  * Finance
+
+### Agent Workflow
+
+LangGraph orchestrates a multi-step reasoning pipeline:
+
+Router → Retrieval → Summarizer → Critic
+
+The workflow:
+
+1. Routes incoming queries
+2. Retrieves relevant documents
+3. Generates grounded answers
+4. Validates response quality before returning results
+
+### Real-Time Chat Experience
+
+* Server-Sent Events (SSE) streaming
+* Source citations
+* Agent execution trace visualization
+* Local chat history persistence
+* Session management
+
+---
+
+## System Architecture
 
 ```text
-Frontend: Vue + Vite + Pinia
-    |
-    | /api/v1/upload
-    | /api/v1/stream
-    v
-Backend: FastAPI
-    |
-    | LangGraph agent workflow
-    | Router -> Retrieval/Summarizer -> Critic
-    v
-RAG Services
-    |
-    | PDF loader
-    | Recursive chunking
-    | Sentence Transformers embeddings
-    | RBAC metadata
-    v
-Qdrant Vector DB
+Frontend (Vue + Vite + Pinia)
+|
+| REST APIs
+| SSE Streaming
+v
+Backend (FastAPI)
+|
+| LangGraph Workflow
+| Router -> Retrieval -> Summarizer -> Critic
+v
+RAG Layer
+|
+| PDF Processing
+| Recursive Chunking
+| Embeddings
+| Metadata Filtering
+v
+Qdrant Vector Database
 ```
 
-## Tech Stack
+---
 
-- **Frontend:** Vue, Vite, Pinia
-- **Backend:** FastAPI, SSE streaming
-- **Agents:** LangGraph
-- **LLM:** Groq-hosted Llama 3.3 model
-- **Embeddings:** Sentence Transformers `all-MiniLM-L6-v2`
-- **Vector DB:** Qdrant
-- **Document Processing:** LangChain PDF loader and recursive text splitter
-- **Local Services:** Docker Compose for Qdrant and Redis
+## Technology Stack
 
-## Current Resume Bullets
+### Frontend
 
-Use these bullets for the current state of the project. They are intentionally written to be defensible from the code and UI.
+* Vue 3
+* Vite
+* Pinia
+* Vue Router
 
-- Architected an enterprise-style conversational AI platform with FastAPI, Vue, LangGraph, Qdrant, and streaming chat for document-grounded Q&A over private uploaded knowledge bases.
-- Built a RAG pipeline using PDF ingestion, recursive document chunking, Sentence Transformers embeddings, Qdrant dense vector retrieval, and grounded Llama 3.3 generation to reduce unsupported answers.
-- Implemented LangGraph-based multi-agent orchestration with router, retrieval, summarization, and critic nodes, exposing source citations and agent path traces in the chat interface.
-- Added role-aware retrieval controls using document-level access metadata and Qdrant filters, enabling users to restrict document access by role such as HR, Engineering, Finance, and Admin.
-- Developed a recruiter-ready Vue product interface with dashboard, document ingestion, streaming chat, source citations, local chat history, monitoring, and settings surfaces.
+### Backend
 
-## Resume Claims To Avoid Until Implemented
+* FastAPI
+* Python
+* Server-Sent Events (SSE)
 
-Do not claim these yet unless the corresponding work is added and tested:
+### AI & Retrieval
 
-- FAISS retrieval
-- Active BM25 hybrid retrieval
-- Active cross-encoder reranking
-- BERT-based semantic chunking
-- Presidio PII masking
-- Prompt injection defense
-- Tenant-level isolation
-- Full audit logging
-- LangSmith or RAGAS evaluation scores
-- QLoRA/PEFT fine-tuning or 4-bit quantization
+* LangGraph
+* LangChain
+* Groq
+* Llama 3.3
+* Sentence Transformers
+* Qdrant
 
-## Planned Improvements
+### Infrastructure
 
-- Hybrid retrieval with Qdrant dense search plus BM25 sparse retrieval.
-- Cross-encoder reranking integrated into the active query path.
-- Backend-persisted chat sessions using Redis or a database.
-- Document management page with indexed files, chunk counts, roles, and delete/re-index actions.
-- PII redaction before indexing and generation.
-- Prompt injection detection for uploaded documents and user queries.
-- Tenant-aware document isolation.
-- Audit logging for query, role, retrieved sources, and model response.
-- RAGAS/LangSmith evaluation pipeline for faithfulness, answer relevancy, latency, and token usage.
+* Docker Compose
+* Redis
+* Qdrant
+
+---
+
+## Project Structure
+
+```
+NexusAI/
+│
+├── backend/
+│   ├── api/
+│   ├── services/
+│   ├── agents/
+│   ├── models/
+│   └── uploads/
+│
+├── frontend/
+│   ├── src/
+│   ├── components/
+│   ├── pages/
+│   └── stores/
+│
+├── docker-compose.yml
+└── README.md
+```
+
+---
 
 ## Local Setup
 
-### 1. Start Infrastructure
+### Start Infrastructure
 
-```powershell
+```bash
 docker compose up qdrant redis
 ```
 
-Qdrant dashboard:
+Qdrant Dashboard:
 
-```text
+```
 http://localhost:6333/dashboard
 ```
 
-### 2. Start Backend
+### Start Backend
 
-```powershell
+```bash
 cd backend
-.\venv\Scripts\Activate.ps1
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+uvicorn app.main:app 
+--host 0.0.0.0 
+--port 8000 
+--reload
 ```
 
-Create `backend/.env` with your Groq key:
+Create:
+
+```
+backend/.env
+```
 
 ```env
 GROQ_API_KEY=your_key_here
 ```
 
-### 3. Start Frontend
+### Start Frontend
 
-```powershell
+```bash
 cd frontend
+
 npm install
 npm run dev
 ```
 
-Frontend:
+Frontend URL:
 
-```text
+```
 http://localhost:5173
 ```
 
-## Demo Flow
+---
 
-1. Open the Documents page.
-2. Upload a PDF and select allowed roles, for example `hr`.
-3. Open the Chat page.
-4. Set Active role to `engineering` and ask about the HR document.
-5. The assistant should not retrieve HR-only sources.
-6. Switch Active role to `hr` and ask again.
-7. The assistant should answer using the HR document and show citations.
+## Demo Workflow
 
-## Notes
+1. Upload a PDF document.
+2. Assign allowed access roles.
+3. Open the chat interface.
+4. Ask questions related to the uploaded document.
+5. Observe retrieval citations and agent execution path.
+6. Switch user roles and verify RBAC filtering behavior.
 
-- Documents uploaded before the RBAC feature may not contain `allowed_roles` metadata. Re-upload documents after restarting the backend for clean RBAC tests.
-- `admin` is treated as a full-access role.
-- Non-admin roles are filtered against document `allowed_roles`.
-- Monitoring currently shows active/planned service signals, not measured benchmark results.
+---
+
+## Current Capabilities
+
+* PDF ingestion
+* Vector search
+* LangGraph orchestration
+* Streaming responses
+* Source citations
+* Role-based retrieval filtering
+* Chat history persistence
+* Monitoring dashboard
+
+---
+
+## Roadmap
+
+* Hybrid Retrieval (Dense + BM25)
+* Cross-Encoder Reranking
+* Redis-Persisted Conversations
+* PII Detection & Redaction
+* Prompt Injection Protection
+* Multi-Tenant Isolation
+* Audit Logging
+* LangSmith Observability
+* RAGAS Evaluation Pipeline
+
+---
+
+## License
+
+MIT License
