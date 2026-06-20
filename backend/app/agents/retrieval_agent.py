@@ -33,5 +33,6 @@ def retrieval_agent(state):
     )
 
     return {
-        "response": result["final_response"]
+        "response": result["final_response"],
+        "sources": result.get("sources", [])
     }

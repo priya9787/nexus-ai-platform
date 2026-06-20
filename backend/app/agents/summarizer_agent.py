@@ -31,5 +31,6 @@ def summarizer_agent(state):
 
     return {
         "response":
-        response.choices[0].message.content
+        response.choices[0].message.content,
+        "sources": []
     }

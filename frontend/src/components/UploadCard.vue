@@ -1,3 +1,47 @@
+<script setup>
+import { ref } from "vue";
+
+const uploadStatus = ref("");
+const uploadError = ref("");
+const isUploading = ref(false);
+
+const uploadFiles = async (event) => {
+  const files = Array.from(event.target.files || []);
+
+  if (!files.length) {
+    return;
+  }
+
+  uploadStatus.value = "";
+  uploadError.value = "";
+  isUploading.value = true;
+
+  try {
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/v1/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Upload failed for ${file.name}`);
+      }
+    }
+
+    uploadStatus.value = `${files.length} file${files.length === 1 ? "" : "s"} uploaded and processed.`;
+  } catch (error) {
+    uploadError.value = error.message || "Upload failed. Please try again.";
+  } finally {
+    isUploading.value = false;
+    event.target.value = "";
+  }
+};
+</script>
+
 <template>
   <article class="upload-card">
     <div class="drop-zone">
@@ -5,10 +49,13 @@
       <h2>Upload enterprise documents</h2>
       <p>PDF, DOCX, TXT, and policy files are prepared for chunking, embedding, and role-aware retrieval.</p>
 
-      <label>
-        Select files
-        <input type="file" multiple />
+      <label :class="{ disabled: isUploading }">
+        {{ isUploading ? "Uploading..." : "Select files" }}
+        <input type="file" multiple :disabled="isUploading" @change="uploadFiles" />
       </label>
+
+      <p v-if="uploadStatus" class="status success">{{ uploadStatus }}</p>
+      <p v-if="uploadError" class="status error">{{ uploadError }}</p>
     </div>
   </article>
 </template>
@@ -66,7 +113,25 @@ label {
   font-weight: 800;
 }
 
+label.disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
 input {
   display: none;
+}
+
+.status {
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+
+.success {
+  color: #86efac;
+}
+
+.error {
+  color: #fca5a5;
 }
 </style>

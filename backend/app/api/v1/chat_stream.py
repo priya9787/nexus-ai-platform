@@ -5,6 +5,7 @@ from sse_starlette.sse import (
 )
 
 import asyncio
+import json
 
 from app.services.agent_service import (
     AgentService
@@ -28,6 +29,16 @@ async def stream_chat(
         
         print("agent finished")
 
+        yield {
+            "event": "path",
+            "data": json.dumps(result.get("path", []))
+        }
+
+        yield {
+            "event": "sources",
+            "data": json.dumps(result.get("sources", []))
+        }
+
         response = result[
             "final_response"
         ]
@@ -41,6 +52,11 @@ async def stream_chat(
             await asyncio.sleep(
                 0.03
             )
+
+        yield {
+            "event": "done",
+            "data": "ok"
+        }
 
     return EventSourceResponse(
         event_generator()

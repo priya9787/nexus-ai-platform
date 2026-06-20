@@ -39,6 +39,8 @@ function sendMessage() {
   });
 
   chatStore.setLoading(true);
+  chatStore.setSources([]);
+  chatStore.setPath([]);
 
   chatStore.addMessage({
     role: "assistant",
@@ -49,7 +51,7 @@ function sendMessage() {
     chatStore.messages.length - 1;
 
   eventSource.value = new EventSource(
-    `http://localhost:8000/api/v1/stream?query=${encodeURIComponent(query)}&session_id=${sessionId.value}`,
+    `/api/v1/stream?query=${encodeURIComponent(query)}&session_id=${sessionId.value}`,
   );
 
   eventSource.value.addEventListener(
@@ -66,11 +68,11 @@ function sendMessage() {
     (event) => {
       try {
         chatStore.setSources(
-          JSON.parse(
-            event.data.replace(/'/g, '"'),
-          ),
+          JSON.parse(event.data),
         );
-      } catch {}
+      } catch (error) {
+        console.error("Unable to parse sources event", error);
+      }
     },
   );
 
@@ -79,11 +81,11 @@ function sendMessage() {
     (event) => {
       try {
         chatStore.setPath(
-          JSON.parse(
-            event.data.replace(/'/g, '"'),
-          ),
+          JSON.parse(event.data),
         );
-      } catch {}
+      } catch (error) {
+        console.error("Unable to parse path event", error);
+      }
     },
   );
 

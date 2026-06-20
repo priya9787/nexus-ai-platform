@@ -29,7 +29,9 @@ class AgentService:
 
             "query": query,
             
-            "history":history
+            "history":history,
+
+            "sources": []
         })
 
         MemoryService.save_message(
@@ -57,9 +59,7 @@ class AgentService:
 
                 "router",
 
-                result.get(
-                    "agent_decision"
-                ),
+                "retrieval" if result.get("agent_decision") == "retrieval" else "summarizer",
 
                 "critic"
 

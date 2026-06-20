@@ -14,3 +14,5 @@ class AgentState(TypedDict):
     agent_decision: str
     
     history: list
+
+    sources: List[dict]

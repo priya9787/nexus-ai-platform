@@ -33,5 +33,6 @@ def critic_agent(state):
 
     return {
         "final_response":response,
-        "critic_feedback":critique.choices[0].message.content
+        "critic_feedback":critique.choices[0].message.content,
+        "sources": state.get("sources", [])
     }
