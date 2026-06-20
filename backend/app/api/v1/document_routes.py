@@ -1,7 +1,8 @@
 from fastapi import (
     APIRouter,
     UploadFile,
-    File
+    File,
+    Form
 )
 
 import os
@@ -17,7 +18,8 @@ router = APIRouter()
 @router.post("/upload")
 
 async def upload_document(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    allowed_roles: str = Form("admin")
 ):
     # Create uploads directory if it doesn't exist
     os.makedirs("uploads", exist_ok=True)
@@ -32,7 +34,14 @@ async def upload_document(
         buffer.write(contents)
 
     result = (
-        IngestionService.process_document(file_path)
+        IngestionService.process_document(
+            file_path,
+            allowed_roles=[
+                role.strip().lower()
+                for role in allowed_roles.split(",")
+                if role.strip()
+            ]
+        )
     )
 
     return {

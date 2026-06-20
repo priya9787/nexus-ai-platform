@@ -4,11 +4,14 @@ import { ref } from "vue";
 const uploadStatus = ref("");
 const uploadError = ref("");
 const isUploading = ref(false);
+const roleOptions = ["admin", "hr", "engineering", "finance"];
+const allowedRoles = ref(["admin"]);
 
 const uploadFiles = async (event) => {
   const files = Array.from(event.target.files || []);
 
-  if (!files.length) {
+  if (!files.length || !allowedRoles.value.length) {
+    uploadError.value = "Select at least one role before uploading.";
     return;
   }
 
@@ -20,6 +23,7 @@ const uploadFiles = async (event) => {
     for (const file of files) {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("allowed_roles", allowedRoles.value.join(","));
 
       const response = await fetch("/api/v1/upload", {
         method: "POST",
@@ -47,11 +51,34 @@ const uploadFiles = async (event) => {
     <div class="drop-zone">
       <div class="upload-icon">UP</div>
       <h2>Upload enterprise documents</h2>
-      <p>PDF, DOCX, TXT, and policy files are prepared for chunking, embedding, and role-aware retrieval.</p>
+      <p>PDF files are prepared for chunking, embedding, and role-aware retrieval.</p>
 
-      <label :class="{ disabled: isUploading }">
+      <div class="role-picker">
+        <span>Accessible to</span>
+
+        <label
+          v-for="role in roleOptions"
+          :key="role"
+          class="role-option"
+        >
+          <input
+            v-model="allowedRoles"
+            type="checkbox"
+            :value="role"
+            :disabled="isUploading"
+          />
+          {{ role }}
+        </label>
+      </div>
+
+      <label :class="{ disabled: isUploading || !allowedRoles.length }">
         {{ isUploading ? "Uploading..." : "Select files" }}
-        <input type="file" multiple :disabled="isUploading" @change="uploadFiles" />
+        <input
+          type="file"
+          multiple
+          :disabled="isUploading || !allowedRoles.length"
+          @change="uploadFiles"
+        />
       </label>
 
       <p v-if="uploadStatus" class="status success">{{ uploadStatus }}</p>
@@ -120,6 +147,37 @@ label.disabled {
 
 input {
   display: none;
+}
+
+.role-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 20px;
+}
+
+.role-picker span {
+  width: 100%;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.role-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: #1e293b;
+  color: #dbeafe;
+  font-size: 13px;
+}
+
+.role-option input {
+  display: inline-block;
 }
 
 .status {

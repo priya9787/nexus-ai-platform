@@ -18,14 +18,20 @@ router = APIRouter()
 
 async def stream_chat(
     query: str,
-    session_id: str ='test-session'
+    session_id: str ='test-session',
+    role: str = "admin"
 ):
 
     async def event_generator():
         
         print("generator started")
 
-        result = await asyncio.to_thread(AgentService.run,session_id,query)
+        result = await asyncio.to_thread(
+            AgentService.run,
+            session_id,
+            query,
+            role.lower()
+        )
         
         print("agent finished")
 

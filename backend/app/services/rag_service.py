@@ -10,6 +10,18 @@ from app.services.generation_service import (
 class RAGService:
 
     @staticmethod
+    def _can_access_point(point, user_role: str):
+        if user_role == "admin":
+            return True
+
+        allowed_roles = point.payload.get("allowed_roles", [])
+
+        return (
+            user_role in allowed_roles
+            or "all" in allowed_roles
+        )
+
+    @staticmethod
     def _is_no_answer(answer: str):
         normalized = answer.strip().lower()
 
@@ -28,10 +40,23 @@ class RAGService:
         )
 
     @staticmethod
-    def ask(query: str):
+    def ask(
+        query: str,
+        user_role: str = "admin"
+    ):
 
-        results = RetrievalService.search(query)
-        points = results.points
+        results = RetrievalService.search(
+            query,
+            user_role=user_role
+        )
+        points = [
+            point
+            for point in results.points
+            if RAGService._can_access_point(
+                point,
+                user_role
+            )
+        ]
 
         context = "\n".join(
             point.payload["text"]
@@ -39,7 +64,10 @@ class RAGService:
             )
         
         sources = [
-            point.payload["metadata"]
+            {
+                **point.payload["metadata"],
+                "allowed_roles": point.payload.get("allowed_roles", [])
+            }
             for point in points
             ]
 

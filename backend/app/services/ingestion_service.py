@@ -19,11 +19,18 @@ from app.services.vector_db_service import (
 class IngestionService:
 
     @staticmethod
-    def process_document(file_path: str):
+    def process_document(
+        file_path: str,
+        allowed_roles=None
+    ):
+        allowed_roles = allowed_roles or ["admin"]
 
         documents = (
             DocumentLoaderService.load_pdf(file_path)
         )
+
+        for document in documents:
+            document.metadata["allowed_roles"] = allowed_roles
 
         chunks = (
             ChunkingService.chunk_documents(documents)
@@ -37,7 +44,8 @@ class IngestionService:
 
         VectorDBService.store_embeddings(
             chunks,
-            embeddings
+            embeddings,
+            allowed_roles
         )
 
         return {

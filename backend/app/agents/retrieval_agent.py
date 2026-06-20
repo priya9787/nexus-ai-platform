@@ -29,7 +29,8 @@ def retrieval_agent(state):
     """
 
     result = RAGService.ask(
-        enriched_query
+        enriched_query,
+        user_role=state.get("user_role", "admin")
     )
 
     return {

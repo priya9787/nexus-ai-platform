@@ -16,3 +16,5 @@ class AgentState(TypedDict):
     history: list
 
     sources: List[dict]
+
+    user_role: str

@@ -12,7 +12,8 @@ class AgentService:
     @staticmethod
     def run(
         session_id,
-        query
+        query,
+        user_role="admin"
     ):
 
         MemoryService.save_message(
@@ -31,7 +32,9 @@ class AgentService:
             
             "history":history,
 
-            "sources": []
+            "sources": [],
+
+            "user_role": user_role
         })
 
         MemoryService.save_message(

@@ -5,7 +5,7 @@ const stats = [
   { title: "Vector Store", value: "Qdrant", meta: "Stores document chunks and embeddings" },
   { title: "Retriever Top K", value: "5", meta: "Nearest-neighbor search per question" },
   { title: "Chunking", value: "500 / 100", meta: "Recursive chunk size and overlap" },
-  { title: "Chat Sessions", value: "Local", meta: "Saved in browser storage for this demo" },
+  { title: "RBAC Retrieval", value: "Enabled", meta: "Qdrant filters by active user role" },
 ];
 
 const agents = ["Router Agent", "Retrieval Agent", "Summarizer Agent", "Critic Agent"];
@@ -19,7 +19,7 @@ const pipeline = ["PDF loading", "Recursive chunking", "MiniLM embeddings", "Qdr
         <p class="eyebrow">System overview</p>
         <h1>Enterprise AI operating system</h1>
         <p>
-          Document ingestion, vector retrieval, multi-agent routing, and streamed answers over uploaded enterprise knowledge.
+          Document ingestion, role-aware vector retrieval, multi-agent routing, and streamed answers over uploaded enterprise knowledge.
         </p>
       </div>
 

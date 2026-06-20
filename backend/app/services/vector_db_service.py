@@ -5,6 +5,8 @@ from qdrant_client.models import (
     PointStruct
 )
 
+import uuid
+
 from app.core.config import settings
 
 
@@ -19,8 +21,12 @@ class VectorDBService:
 
     @classmethod
     def create_collection(cls):
+        if cls.client.collection_exists(
+            collection_name=cls.COLLECTION_NAME
+        ):
+            return
 
-        cls.client.recreate_collection(
+        cls.client.create_collection(
             collection_name=cls.COLLECTION_NAME,
             vectors_config=VectorParams(
                 size=384,
@@ -32,7 +38,8 @@ class VectorDBService:
     def store_embeddings(
         cls,
         chunks,
-        embeddings
+        embeddings,
+        allowed_roles
     ):
 
         points = []
@@ -43,11 +50,12 @@ class VectorDBService:
 
             points.append(
                 PointStruct(
-                    id=idx,
+                    id=str(uuid.uuid4()),
                     vector=embedding.tolist(),
                     payload={
                         "text": chunk.page_content,
-                        "metadata": chunk.metadata
+                        "metadata": chunk.metadata,
+                        "allowed_roles": allowed_roles
                     }
                 )
             )

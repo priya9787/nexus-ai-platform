@@ -3,7 +3,8 @@ const security = [
   ["CORS", "Enabled for local frontend"],
   ["Grounding", "Answers restricted to retrieved context"],
   ["Upload validation", "Basic FastAPI file handling"],
-  ["RBAC / PII controls", "Planned"],
+  ["Role-aware retrieval", "Enabled with Qdrant filters"],
+  ["PII controls", "Planned"],
 ];
 
 const modelConfig = [

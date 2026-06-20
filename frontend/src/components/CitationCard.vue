@@ -24,6 +24,9 @@ const page = computed(() => {
     <div class="source-meta">
       <span v-if="page">Page {{ page }}</span>
       <span v-if="source?.total_pages">{{ source.total_pages }} pages</span>
+      <span v-if="source?.allowed_roles?.length">
+        {{ source.allowed_roles.join(", ") }}
+      </span>
     </div>
   </article>
 </template>

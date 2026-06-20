@@ -20,6 +20,9 @@ const sessionId = ref(
   crypto.randomUUID()
 );
 
+const roleOptions = ["admin", "hr", "engineering", "finance"];
+const activeRole = ref("admin");
+
 const savedChats = ref([]);
 
 const currentSessionTitle = computed(() => {
@@ -52,6 +55,7 @@ function loadChatHistory() {
       messages: chat.messages || [],
       sources: chat.sources || [],
       agentPath: chat.agentPath || [],
+      role: chat.role || "admin",
     }));
   } catch {
     savedChats.value = [];
@@ -72,6 +76,7 @@ function persistCurrentSession() {
     messages: cloneData(chatStore.messages),
     sources: cloneData(chatStore.sources),
     agentPath: cloneData(chatStore.agentPath),
+    role: activeRole.value,
   };
 
   if (existingIndex >= 0) {
@@ -94,6 +99,7 @@ function loadSession(chat) {
   eventSource.value = null;
 
   sessionId.value = chat.id;
+  activeRole.value = chat.role || "admin";
 
   chatStore.messages = cloneData(chat.messages || []);
   chatStore.sources = cloneData(chat.sources || []);
@@ -147,7 +153,7 @@ function sendMessage() {
     chatStore.messages.length - 1;
 
   eventSource.value = new EventSource(
-    `/api/v1/stream?query=${encodeURIComponent(query)}&session_id=${sessionId.value}`,
+    `/api/v1/stream?query=${encodeURIComponent(query)}&session_id=${sessionId.value}&role=${activeRole.value}`,
   );
 
   eventSource.value.addEventListener(
@@ -253,6 +259,22 @@ function newChat() {
         </button>
       </header>
 
+      <div class="role-bar">
+        <span>Active role</span>
+        <select
+          v-model="activeRole"
+          :disabled="chatStore.loading"
+        >
+          <option
+            v-for="role in roleOptions"
+            :key="role"
+            :value="role"
+          >
+            {{ role }}
+          </option>
+        </select>
+      </div>
+
       <div class="conversation">
         <div
           v-if="!chatStore.messages.length"
@@ -312,6 +334,7 @@ function newChat() {
           <span>{{ chat.title }}</span>
           <small>
             {{ formatChatTime(chat.updatedAt) }}
+            · {{ chat.role || "admin" }}
             · {{ chat.sources?.length || 0 }} sources
             · {{ chat.agentPath?.length || 0 }} steps
           </small>
@@ -407,6 +430,33 @@ function newChat() {
 
 .new-chat-btn:hover {
   background: rgba(37, 99, 235, 0.28);
+}
+
+.role-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 28px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  background: #0f172a;
+}
+
+.role-bar span {
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.role-bar select {
+  min-width: 150px;
+  height: 36px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 0 10px;
+  font-weight: 800;
 }
 
 .conversation {
