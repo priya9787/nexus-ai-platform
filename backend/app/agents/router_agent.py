@@ -9,7 +9,6 @@ client = Groq(
 )
 
 def router_agent(state):
-    print("Groq Key",settings.GROQ_API_KEY)
     
     start = time.time()
 
