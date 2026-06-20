@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import ChatWindow from "../components/ChatWindow.vue";
 import CitationCard from "../components/CitationCard.vue";
@@ -10,6 +10,8 @@ import { useChatStore } from "../stores/chatStore";
 
 const chatStore = useChatStore();
 
+const CHAT_HISTORY_KEY = "nexus-ai-chat-sessions";
+
 const input = ref("");
 
 const eventSource = ref(null);
@@ -17,6 +19,100 @@ const eventSource = ref(null);
 const sessionId = ref(
   crypto.randomUUID()
 );
+
+const savedChats = ref([]);
+
+const currentSessionTitle = computed(() => {
+  const firstUserMessage = chatStore.messages.find(
+    (message) => message.role === "user",
+  );
+
+  return firstUserMessage?.content?.slice(0, 48) || "Untitled chat";
+});
+
+function cloneData(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function saveChatHistory() {
+  localStorage.setItem(
+    CHAT_HISTORY_KEY,
+    JSON.stringify(savedChats.value),
+  );
+}
+
+function loadChatHistory() {
+  try {
+    const chats = JSON.parse(
+      localStorage.getItem(CHAT_HISTORY_KEY) || "[]",
+    );
+
+    savedChats.value = chats.map((chat) => ({
+      ...chat,
+      messages: chat.messages || [],
+      sources: chat.sources || [],
+      agentPath: chat.agentPath || [],
+    }));
+  } catch {
+    savedChats.value = [];
+  }
+}
+
+function persistCurrentSession() {
+  if (!chatStore.messages.length) return;
+
+  const existingIndex = savedChats.value.findIndex(
+    (chat) => chat.id === sessionId.value,
+  );
+
+  const session = {
+    id: sessionId.value,
+    title: currentSessionTitle.value,
+    updatedAt: new Date().toISOString(),
+    messages: cloneData(chatStore.messages),
+    sources: cloneData(chatStore.sources),
+    agentPath: cloneData(chatStore.agentPath),
+  };
+
+  if (existingIndex >= 0) {
+    savedChats.value.splice(existingIndex, 1, session);
+  } else {
+    savedChats.value.unshift(session);
+  }
+
+  savedChats.value.sort(
+    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+  );
+
+  savedChats.value = savedChats.value.slice(0, 10);
+
+  saveChatHistory();
+}
+
+function loadSession(chat) {
+  eventSource.value?.close();
+  eventSource.value = null;
+
+  sessionId.value = chat.id;
+
+  chatStore.messages = cloneData(chat.messages || []);
+  chatStore.sources = cloneData(chat.sources || []);
+  chatStore.agentPath = cloneData(chat.agentPath || []);
+  chatStore.setLoading(false);
+}
+
+function formatChatTime(value) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+onMounted(() => {
+  loadChatHistory();
+});
 
 function sendMessage() {
   if (!input.value.trim() || chatStore.loading) return;
@@ -60,6 +156,8 @@ function sendMessage() {
       chatStore.messages[
         assistantIndex
       ].content += event.data;
+
+      persistCurrentSession();
     },
   );
 
@@ -70,6 +168,8 @@ function sendMessage() {
         chatStore.setSources(
           JSON.parse(event.data),
         );
+
+        persistCurrentSession();
       } catch (error) {
         console.error("Unable to parse sources event", error);
       }
@@ -83,6 +183,8 @@ function sendMessage() {
         chatStore.setPath(
           JSON.parse(event.data),
         );
+
+        persistCurrentSession();
       } catch (error) {
         console.error("Unable to parse path event", error);
       }
@@ -97,6 +199,8 @@ function sendMessage() {
       eventSource.value?.close();
 
       eventSource.value = null;
+
+      persistCurrentSession();
     },
   );
 
@@ -109,9 +213,13 @@ function sendMessage() {
   };
 
   input.value = "";
+
+  persistCurrentSession();
 }
 
 function newChat() {
+
+  persistCurrentSession();
 
   eventSource.value?.close();
 
@@ -180,6 +288,36 @@ function newChat() {
     </section>
 
     <aside class="sidebar-panel">
+      <div class="panel-card">
+        <div class="panel-heading">
+          <h3>Recent Chats</h3>
+          <span>{{ savedChats.length }}</span>
+        </div>
+
+        <p
+          v-if="!savedChats.length"
+          class="panel-empty"
+        >
+          Previous conversations will appear here.
+        </p>
+
+        <button
+          v-for="chat in savedChats"
+          :key="chat.id"
+          type="button"
+          class="session-item"
+          :class="{ active: chat.id === sessionId }"
+          @click="loadSession(chat)"
+        >
+          <span>{{ chat.title }}</span>
+          <small>
+            {{ formatChatTime(chat.updatedAt) }}
+            · {{ chat.sources?.length || 0 }} sources
+            · {{ chat.agentPath?.length || 0 }} steps
+          </small>
+        </button>
+      </div>
+
       <div class="panel-card">
         <div class="panel-heading">
           <h3>Sources</h3>
@@ -405,6 +543,38 @@ function newChat() {
   margin: 0;
   color: #94a3b8;
   line-height: 1.5;
+}
+
+.session-item {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 8px;
+  background: #1e293b;
+  color: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+}
+
+.session-item:hover,
+.session-item.active {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(37, 99, 235, 0.22);
+}
+
+.session-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 800;
+}
+
+.session-item small {
+  color: #94a3b8;
+  font-size: 12px;
 }
 
 @media (max-width: 1100px) {

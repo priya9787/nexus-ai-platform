@@ -2,28 +2,28 @@
 import StatCard from "../components/StatCard.vue";
 
 const stats = [
-  { title: "Indexed Documents", value: "128", meta: "RBAC filtered knowledge base" },
-  { title: "Chat Sessions", value: "2,304", meta: "Streaming RAG conversations" },
-  { title: "Avg Latency", value: "0.7s", meta: "FastAPI plus Redis cache" },
-  { title: "Faithfulness", value: "0.87", meta: "Tracked with RAGAS" },
+  { title: "Vector Store", value: "Qdrant", meta: "Stores document chunks and embeddings" },
+  { title: "Retriever Top K", value: "5", meta: "Nearest-neighbor search per question" },
+  { title: "Chunking", value: "500 / 100", meta: "Recursive chunk size and overlap" },
+  { title: "Chat Sessions", value: "Local", meta: "Saved in browser storage for this demo" },
 ];
 
-const agents = ["Research Agent", "Retrieval Agent", "Compliance Agent", "Critic Agent"];
-const pipeline = ["Semantic chunking", "Hybrid retrieval", "Cross-encoder reranking", "Grounded answer"];
+const agents = ["Router Agent", "Retrieval Agent", "Summarizer Agent", "Critic Agent"];
+const pipeline = ["PDF loading", "Recursive chunking", "MiniLM embeddings", "Qdrant retrieval", "Groq grounded answer"];
 </script>
 
 <template>
   <div class="page">
     <header class="page-header">
       <div>
-        <p class="eyebrow">Production overview</p>
+        <p class="eyebrow">System overview</p>
         <h1>Enterprise AI operating system</h1>
         <p>
-          Secure document intelligence, multi-agent workflow automation, and role-aware retrieval over private enterprise knowledge.
+          Document ingestion, vector retrieval, multi-agent routing, and streamed answers over uploaded enterprise knowledge.
         </p>
       </div>
 
-      <div class="status-pill">Production ready</div>
+      <div class="status-pill">Demo ready</div>
     </header>
 
     <section class="stats-grid">
@@ -40,7 +40,7 @@ const pipeline = ["Semantic chunking", "Hybrid retrieval", "Cross-encoder rerank
       <article class="panel large">
         <div class="panel-header">
           <h2>RAG Pipeline</h2>
-          <span>Hybrid search</span>
+          <span>Live flow</span>
         </div>
 
         <div class="timeline">

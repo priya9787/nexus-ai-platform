@@ -1,18 +1,19 @@
 <script setup>
 const security = [
-  "RBAC retrieval filtering",
-  "PII masking",
-  "Prompt injection defense",
-  "Tenant-level isolation",
+  ["CORS", "Enabled for local frontend"],
+  ["Grounding", "Answers restricted to retrieved context"],
+  ["Upload validation", "Basic FastAPI file handling"],
+  ["RBAC / PII controls", "Planned"],
 ];
 
 const modelConfig = [
-  ["Model", "Llama 3"],
-  ["Retriever", "Hybrid Qdrant / FAISS + BM25"],
-  ["Reranker", "Cross-encoder"],
+  ["Model", "Llama 3.3 70B via Groq"],
+  ["Embeddings", "all-MiniLM-L6-v2"],
+  ["Retriever", "Qdrant vector search"],
+  ["Reranker", "Planned"],
   ["Temperature", "0.0"],
   ["Top K", "5"],
-  ["Chunk Size", "500"],
+  ["Chunking", "500 size / 100 overlap"],
 ];
 </script>
 
@@ -21,7 +22,7 @@ const modelConfig = [
     <header class="page-header">
       <p class="eyebrow">System configuration</p>
       <h1>Settings</h1>
-      <p>Show recruiters the production controls behind the AI platform.</p>
+      <p>Review model, retrieval, security, and observability controls for the AI platform.</p>
     </header>
 
     <section class="settings-grid">
@@ -40,8 +41,9 @@ const modelConfig = [
         <h2>Enterprise Security</h2>
 
         <div class="security-list">
-          <div v-for="item in security" :key="item">
-            {{ item }}
+          <div v-for="[label, value] in security" :key="label">
+            <span>{{ label }}</span>
+            <strong>{{ value }}</strong>
           </div>
         </div>
       </article>
@@ -106,22 +108,21 @@ h1 {
   background: #1e293b;
 }
 
-.config-list div {
+.config-list div,
+.security-list div {
   display: flex;
   justify-content: space-between;
   gap: 16px;
 }
 
-.config-list span {
+.config-list span,
+.security-list span {
   color: #94a3b8;
 }
 
-.config-list strong {
+.config-list strong,
+.security-list strong {
   text-align: right;
-}
-
-.security-list div {
-  color: #dbeafe;
 }
 
 @media (max-width: 900px) {

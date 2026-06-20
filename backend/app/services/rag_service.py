@@ -10,6 +10,24 @@ from app.services.generation_service import (
 class RAGService:
 
     @staticmethod
+    def _is_no_answer(answer: str):
+        normalized = answer.strip().lower()
+
+        no_answer_phrases = [
+            "i do not know",
+            "i don't know",
+            "do not know",
+            "don't know",
+            "not present",
+            "not provided",
+        ]
+
+        return any(
+            phrase in normalized
+            for phrase in no_answer_phrases
+        )
+
+    @staticmethod
     def ask(query: str):
 
         results = RetrievalService.search(query)
@@ -31,6 +49,9 @@ class RAGService:
                 context
             )
         )
+
+        if RAGService._is_no_answer(answer):
+            sources = []
 
         return {
             "final_response": answer,

@@ -1,9 +1,17 @@
 <script setup>
 const metrics = [
-  { label: "Faithfulness", value: "0.87" },
-  { label: "Answer relevancy", value: "0.91" },
-  { label: "P95 latency", value: "1.4s" },
-  { label: "Token cost", value: "$12.40" },
+  { label: "Backend API", value: "FastAPI" },
+  { label: "Streaming", value: "SSE" },
+  { label: "Vector DB", value: "Qdrant" },
+  { label: "Evaluation", value: "Planned" },
+];
+
+const signals = [
+  { name: "Chat stream", status: "Active" },
+  { name: "Document upload", status: "Active" },
+  { name: "Qdrant vector search", status: "Active" },
+  { name: "RAGAS evaluation", status: "Planned" },
+  { name: "LangSmith traces", status: "Planned" },
 ];
 </script>
 
@@ -12,7 +20,7 @@ const metrics = [
     <header class="page-header">
       <p class="eyebrow">Evaluation and observability</p>
       <h1>Monitoring</h1>
-      <p>Track RAG quality, latency, agent execution, and production reliability.</p>
+      <p>Track the services that are active in this build, with planned quality evaluation clearly separated.</p>
     </header>
 
     <section class="metrics-grid">
@@ -25,6 +33,7 @@ const metrics = [
     <section class="monitor-grid">
       <article class="panel large">
         <h2>Quality Trend</h2>
+        <p class="panel-note">Sample visualization reserved for future RAGAS or LangSmith evaluation runs.</p>
         <div class="chart-bars">
           <span style="height: 45%"></span>
           <span style="height: 62%"></span>
@@ -37,10 +46,14 @@ const metrics = [
 
       <article class="panel">
         <h2>Live Signals</h2>
-        <p>LangSmith traces</p>
-        <p>RAGAS evaluation</p>
-        <p>Redis cache health</p>
-        <p>Qdrant vector search</p>
+        <div
+          v-for="signal in signals"
+          :key="signal.name"
+          class="signal-row"
+        >
+          <span>{{ signal.name }}</span>
+          <strong :class="signal.status.toLowerCase()">{{ signal.status }}</strong>
+        </div>
       </article>
     </section>
   </div>
@@ -110,11 +123,32 @@ h1 {
   margin: 0 0 20px;
 }
 
-.panel p {
+.panel p,
+.signal-row {
   padding: 14px;
   border-radius: 12px;
   background: #1e293b;
   color: #cbd5e1;
+}
+
+.panel-note {
+  margin: -6px 0 18px;
+  line-height: 1.5;
+}
+
+.signal-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.signal-row strong {
+  color: #86efac;
+}
+
+.signal-row strong.planned {
+  color: #fde68a;
 }
 
 .chart-bars {
